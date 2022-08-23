@@ -14,7 +14,8 @@ class HashTable {
 
         HashTable(int (*hashFunction)(TKey), void (*insertHash)(HashTable<TKey, TData>*, TKey, TData));
 
-        void printBlock(const TKey block);
+        void printBlock(const int block);
+        bool keyExists(const TKey block);
 };
 
 template <typename TKey, class TData>
@@ -26,8 +27,15 @@ HashTable<TKey, TData>::HashTable(int (*hashFunction)(TKey), void (*insertHash)(
 }
 
 template <typename TKey, class TData>
-void HashTable<TKey, TData>::printBlock(const TKey block){
-    printTree(map[block]);
+void HashTable<TKey, TData>::printBlock(const int key){
+    printTree(map[key]);
+}
+
+template <typename TKey, class TData>
+bool HashTable<TKey, TData>::keyExists(const TKey key){
+    const int hash_position = (*hashFunction)(key);
+
+    return getNodeAddress(map[hash_position], key) != nullptr;
 }
 
 #endif
