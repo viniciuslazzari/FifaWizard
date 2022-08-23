@@ -1,3 +1,6 @@
+#ifndef binary_tree_h
+#define binary_tree_h
+
 #include <iostream>
 
 int max(int a, int b) { return (a > b) ? a : b; }
@@ -119,3 +122,5 @@ void printTree(Node<TKey, TData>* root)
 {
     printTree("", root, false);    
 }
+
+#endif
