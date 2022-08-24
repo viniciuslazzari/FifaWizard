@@ -97,7 +97,9 @@ Node<TKey, TData>* insertNode(Node<TKey, TData>* root, const TKey key, const TDa
 
 template <typename TKey, class TData>
 Node<TKey, TData>* getNodeAddress(Node<TKey, TData>* root, const TKey key){
-    if (root == nullptr || root->key == key) return root;
+    if (root == nullptr) return nullptr;
+    
+    if (root->key == key) return root;
 
     if (root->key < key) return getNodeAddress(root->right, key);
 
