@@ -10,19 +10,17 @@ class Player {
         float score_total;
 };
 
-int player_hashFunction(const int key){
-    return key % 1000;
+int player_hashFunction(const int size, const int key){
+    return key % size;
 }
 
 void player_insertHash(HashTable<int, Player>* table, const int key, const Player data){
-    int hash_position = table->hashFunction(key);
+    int hash_position = table->hashFunction(table->size, key);
 
-    table->map[hash_position] = insertNode<int, Player>(table->map[hash_position], key, data);
+    table->map[hash_position] = insertNode(table->map[hash_position], key, data);
 }
 
-void player_addScore(HashTable<int, Player>* table, const int key, const float score){
-    int hash_position = table->hashFunction(key);
-
-    table->map[hash_position]->data.score_count++;
-    table->map[hash_position]->data.score_total += score;
+void player_addScore(Node<int, Player>* address, const float score){
+    address->data.score_count++;
+    address->data.score_total += score;
 }

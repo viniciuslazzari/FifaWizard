@@ -12,18 +12,16 @@ class User {
         std::vector<Rating> ratings;
 };
 
-int user_hashFunction(const int key){
-    return key % 1000;
+int user_hashFunction(const int size, const int key){
+    return key % size;
 }
 
-void user_addRating(HashTable<int, User>* table, const int key, const Rating rating){
-    int hash_position = table->hashFunction(key);
-
-    table->map[hash_position]->data.ratings.push_back(rating);
+void user_addRating(Node<int, User>* address, const Rating rating){
+    address->data.ratings.push_back(rating);
 }
 
 void user_insertHash(HashTable<int, User>* table, const int key, const User data){
-    int hash_position = table->hashFunction(key);
+    int hash_position = table->hashFunction(table->size, key);
 
     table->map[hash_position] = insertNode<int, User>(table->map[hash_position], key, data);
 }
