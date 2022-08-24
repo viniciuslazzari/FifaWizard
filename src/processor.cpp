@@ -1,6 +1,5 @@
 #include <iostream>
 #include <time.h>
-#include <vector>
 
 #include "csv_parser.hpp"
 
@@ -8,79 +7,73 @@
 #include "user.cpp"
 #include "tag.cpp"
 
-using namespace aria::csv;
+const std::string players_csv = "C:/Users/vinil/dev/Fifa/data/players.csv";
+const std::string ratings_csv = "C:/Users/vinil/dev/Fifa/data/rating.csv";
+const std::string tags_csv = "C:/Users/vinil/dev/Fifa/data/tags.csv";
 
 void processPlayers(HashTable<int, Player>* table){
-    std::ifstream f("data/players.csv");
-    CsvParser parser(f);
+    io::CSVReader<3, io::trim_chars<' '>, io::double_quote_escape<',', '\"'>> in(players_csv);
 
-    bool isData = false;
+    in.read_header(io::ignore_extra_column, "sofifa_id", "name", "player_positions");
 
-    for (auto& row : parser) {
-        if (!isData) {
-            isData = true;
-            continue;
-        }
+    int key; std::string name; std::string player_positions;
 
-        int key = std::stoi(row[0]);
-
+    while(in.read_row(key, name, player_positions)){
         Player data = Player();
 
-        data.name = row[1];
-        data.player_positions = row[2];
+        data.name = name;
+        data.player_positions = player_positions;
 
         table->insertHash(table, key, data);
     }
 }
 
+void handlePlayerRating(HashTable<int, Player>* player_table, int player_key, float score){
+    Node<int, Player>* player_node_address = player_table->findKeyNodeAddress(player_key);
+
+    player_addScore(player_node_address, score);
+}
+
+void handleUser(HashTable<int, User>* user_table, int user_key, int player_key, float score){
+    Rating rating = Rating();
+
+    rating.player_key = player_key;
+    rating.score = score;
+
+    Node<int, User>* user_node_address = user_table->findKeyNodeAddress(user_key);
+
+    if (user_node_address == nullptr){
+        User user = User();
+
+        user.ratings.push_back(rating);
+
+        user_table->insertHash(user_table, user_key, user);
+    }else{
+        user_addRating(user_node_address, rating);
+    }
+}
+
 void processRatings(HashTable<int, Player>* player_table, HashTable<int, User>* user_table){
-    std::ifstream f("data/rating.csv");
-    CsvParser parser(f);
+    io::CSVReader<3> in(ratings_csv);
 
-    bool isData = false;
+    in.read_header(io::ignore_extra_column, "user_id", "sofifa_id", "rating");
 
-    for (auto& row : parser) {
-        if (!isData) {
-            isData = true;
-            continue;
-        }
+    int user_key; int player_key; float score;
 
-        int user_key = std::stoi(row[0]);
-        int player_key = std::stoi(row[1]);
-        float score = std::stod(row[2]);
-
-        player_addScore(player_table, player_key, score);
-
-        if (user_table->keyExists(user_key)){
-            Rating rating = Rating();
-
-            rating.player_key = player_key;
-            rating.score = score;
-
-            user_addRating(user_table, user_key, rating);
-        } else {
-            User user = User();
-
-            user_table->insertHash(user_table, user_key, user);
-        }
+    while(in.read_row(user_key, player_key, score)){
+        handlePlayerRating(player_table, player_key, score);
+        handleUser(user_table, user_key, player_key, score);
     }
 }
 
 void processTags(HashTable<std::string, Tag>* table){
-    std::ifstream f("data/tags.csv");
-    CsvParser parser(f);
+    io::CSVReader<3> in(tags_csv);
 
-    bool isData = false;
+    in.read_header(io::ignore_extra_column, "user_id", "sofifa_id", "tag");
 
-    for (auto& row : parser) {
-        if (!isData) {
-            isData = true;
-            continue;
-        }
+    int user_key; int player_key; std::string key;
 
-        std::string key = row[2];
-        int player_key = std::stoi(row[1]);
-
+    while(in.read_row(user_key, player_key, key)){
         if (table->keyExists(key)){
             tag_addPlayer(table, key, player_key);
         } else {
@@ -94,17 +87,17 @@ void processTags(HashTable<std::string, Tag>* table){
 }
 
 void process(){
-    auto players_table = HashTable<int, Player>(player_hashFunction, player_insertHash);
-    auto users_table = HashTable<int, User>(user_hashFunction, user_insertHash);
-    auto tags_table = HashTable<std::string, Tag>(tag_hashFunction, tag_insertHash);
+    auto players_table = HashTable<int, Player>(1000000, player_hashFunction, player_insertHash);
+    auto users_table = HashTable<int, User>(1000000, user_hashFunction, user_insertHash);
+    auto tags_table = HashTable<std::string, Tag>(1000000, tag_hashFunction, tag_insertHash);
 
-    clock_t tStart = clock();
+    time_t start = time(NULL); 
 
     processPlayers(&players_table);
     processRatings(&players_table, &users_table);
     processTags(&tags_table);
 
-    double time_spend = (double)(clock() - tStart) / CLOCKS_PER_SEC;
+    time_t end = time(NULL); 
 
-    std::cout << time_spend << std::endl;
+    std::cout << (double)end - start << " sec" << std::endl;
 }
