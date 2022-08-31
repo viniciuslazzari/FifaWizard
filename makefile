@@ -2,7 +2,7 @@ PROGRAM_NAME = bin/fifa
 TARGET = src/main.cpp
 LIBS_FOLDERS = lib
 CC = g++
-CFLAGS = -g -Ofast -Wall -W -pedantic -I $(LIBS_FOLDERS)
+CFLAGS = -g -Ofast -Wall -W -pedantic -march=native -fopenmp -D_GLIBCXX_PARALLEL -I $(LIBS_FOLDERS)
 
 all: $(PROGRAM_NAME)
 
