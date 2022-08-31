@@ -27,7 +27,7 @@ Node<TKey, TData>::Node(TKey key, TData data){
 
 template <typename TKey, class TData>
 int getHeight(Node<TKey, TData>* root) {
-    return (root == nullptr) ? 0 : root->height;
+    return (!root) ? 0 : root->height;
 }
 
 template <typename TKey, class TData>
@@ -97,9 +97,7 @@ Node<TKey, TData>* insertNode(Node<TKey, TData>* root, const TKey key, const TDa
 
 template <typename TKey, class TData>
 Node<TKey, TData>* getNodeAddress(Node<TKey, TData>* root, const TKey key){
-    if (root == nullptr) return nullptr;
-    
-    if (root->key == key) return root;
+    if (!root || root->key == key) return root;
 
     if (root->key < key) return getNodeAddress(root->right, key);
 
