@@ -1,3 +1,6 @@
+#ifndef tag_h
+#define tag_h
+
 #include <vector>
 #include "hash_table.hpp"
 
@@ -16,11 +19,7 @@ int tag_hashFunction(const int size, const std::string key){
     return result % size;
 }
 
-void tag_addPlayer(HashTable<std::string, Tag>* table, const std::string key, const int player_key){
-    int hash_position = table->hashFunction(table->size, key);
-
-    Node<std::string, Tag>* address = getNodeAddress(table->map[hash_position], key);
-
+void tag_addPlayer(Node<std::string, Tag>* address, const int player_key){
     address->data.player_keys.push_back(player_key);
 }
 
@@ -29,3 +28,5 @@ void tag_insertHash(HashTable<std::string, Tag>* table, const std::string key, c
 
     table->map[hash_position] = insertNode<std::string, Tag>(table->map[hash_position], key, data);
 }
+
+#endif
