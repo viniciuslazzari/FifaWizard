@@ -14,7 +14,7 @@ int getMax(std::vector<int> array){
 }
   
 std::vector<int> countingSort(std::vector<int> array, int size, int div){ 
-    int aux[size];
+    int* aux = new int[size];
     int digit_position;
     int count[10] = { 0 }; 
   
