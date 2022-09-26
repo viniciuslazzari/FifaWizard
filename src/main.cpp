@@ -15,7 +15,7 @@ int main(){
 
     process(&players_table, &positions_table, &users_table, &tags_table, &players_trie);
 
-    printPlayerByPosition(&positions_table, &players_table);
-
-    std::cin.ignore();
+    while (true){
+        search(&players_table, &positions_table, &users_table, &tags_table, &players_trie);
+    }
 }

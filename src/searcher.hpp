@@ -1,13 +1,11 @@
 #ifndef searcher_h
 #define searcher_h
 
+#include "string_functions.hpp"
 #include "array_functions.hpp"
 
-void printPlayersByNamePrefix(TrieNode* trie, HashTable<int, Player>* players_table){
-    std::string name;
+void printPlayersByNamePrefix(std::string name, TrieNode* trie, HashTable<int, Player>* players_table){
     Node<int, Player>* address;
-
-    std::cin >> name;
 
     std::vector<int> player_keys = returnListOfKeys(trie, name);
 
@@ -24,18 +22,12 @@ void printPlayersByNamePrefix(TrieNode* trie, HashTable<int, Player>* players_ta
     }
 }
 
-void printRatingsByUser(HashTable<int, User>* users_table, HashTable<int, Player>* players_table){
+void printRatingsByUser(int user, HashTable<int, User>* users_table, HashTable<int, Player>* players_table){
     Node<int, User>* user_address;
-    std::string input;
     std::vector<int> user_scores;
     std::vector<Rating> user_ratings;
-    int user_key;
 
-    getline(std::cin, input);
-
-    user_key = stoi(input);
-
-    user_address = users_table->findKeyNodeAddress(user_key);
+    user_address = users_table->findKeyNodeAddress(user);
     user_ratings = user_address->data.ratings;
 
     user_ratings = quicksortObj(user_ratings, 0, user_ratings.size() - 1);
@@ -56,16 +48,13 @@ void printRatingsByUser(HashTable<int, User>* users_table, HashTable<int, Player
     }
 }
 
-void printPlayerByPosition(HashTable<std::string, Position>* positions_table, HashTable<int, Player>* players_table){
-    std::string input;
+void printPlayerByPosition(std::string position, int amount, HashTable<std::string, Position>* positions_table, HashTable<int, Player>* players_table){
     Node<std::string, Position>* position_address;
     Node<int, Player>* player_address;
     std::vector<int> player_keys;
     std::vector<PlayersModel> models;
 
-    getline(std::cin, input);
-
-    position_address = positions_table->findKeyNodeAddress(input);
+    position_address = positions_table->findKeyNodeAddress(position);
 
     player_keys = position_address->data.player_keys;
 
@@ -87,22 +76,17 @@ void printPlayerByPosition(HashTable<std::string, Position>* positions_table, Ha
     models = quicksortObj(models, 0, models.size() - 1);
 
     std::reverse(models.begin(), models.end());
-    models = {models.begin(), models.begin() + 10}; 
+    models = {models.begin(), models.begin() + amount}; 
 
     for (auto model : models){
         model.display();
     }
 }
 
-void printPlayersByTag(HashTable<std::string, Tag>* tags_table, HashTable<int, Player>* players_table){
-    std::string name;
+void printPlayersByTag(std::vector<std::string> tags, HashTable<std::string, Tag>* tags_table, HashTable<int, Player>* players_table){
     Node<std::string, Tag>* tag_address;
     Node<int, Player>* player_address;
     std::vector<int> player_keys, tag_players;
-
-    getline(std::cin, name);
-
-    std::vector<std::string> tags = splitStringWithQuotes(name);
 
     for (std::string tag : tags){
         tag_address = tags_table->findKeyNodeAddress(tag);
@@ -130,8 +114,42 @@ void printPlayersByTag(HashTable<std::string, Tag>* tags_table, HashTable<int, P
     }
 }
 
-void mainSearch(){
-    
+void search(HashTable<int, Player>* players_table, 
+            HashTable<std::string, Position>* positions_table, 
+            HashTable<int, User>* users_table, 
+            HashTable<std::string, Tag>* tags_table,
+            TrieNode* players_trie)
+{
+    std::string input;
+
+    getline(std::cin, input);
+
+    if (input.substr(0,6) == "player"){
+        std::string name  = input.substr(7);
+
+        printPlayersByNamePrefix(name, players_trie, players_table);
+    } else if (input.substr(0,4) == "user"){
+        int user = stoi(input.substr(5));
+
+        printRatingsByUser(user, users_table, players_table);
+    } else if (input.substr(0,3) == "top"){
+        size_t pos = input.find(' ');
+
+        std::string position = input.substr(pos + 1);
+        position = removeChar(position, '\'');
+
+        int amount = stoi(input.substr(3, pos - 3));
+
+        printPlayerByPosition(position, amount, positions_table, players_table);
+    } else if (input.substr(0,4) == "tags"){
+        size_t pos = input.find(' ');
+
+        std::vector<std::string> tags = splitStringWithQuotes(input.substr(pos + 1));
+
+        printPlayersByTag(tags, tags_table, players_table);
+    } else {
+        std::cout << "Command not found!" << std::endl;
+    }
 }
 
 #endif
