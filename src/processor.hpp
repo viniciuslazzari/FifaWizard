@@ -140,11 +140,6 @@ void process(HashTable<int, Player>* players_table,
     processRatings(players_table, users_table);
     processTags(tags_table);
 
-    // players_table.returnOccupation();
-    // positions_table.returnOccupation();
-    // users_table.returnOccupation();
-    // tags_table.returnOccupation();
-
     time_t end = time(NULL); 
 
     std::cout << (double)end - start << " sec" << std::endl;
