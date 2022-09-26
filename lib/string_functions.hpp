@@ -17,7 +17,7 @@ std::vector<std::string> splitStringWithQuotes(std::string str) {
     bool inWord = false;
 
     for (char c : str){
-        if (c == '\"'){
+        if (c == '\''){
             inWord = !inWord;
 
             if (!inWord){
@@ -49,6 +49,12 @@ std::vector<std::string> splitString(std::string str, std::string delimiter){
     strings.push_back(str.substr(start, end - start));
 
     return strings;
+}
+
+std::string removeChar(std::string str, char ch){
+    str.erase(remove(str.begin(), str.end(), ch), str.end());
+
+    return str;
 }
 
 #endif
